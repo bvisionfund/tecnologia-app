@@ -1,15 +1,24 @@
 import 'package:flutter/material.dart';
+
 import 'models/availability_slot.dart';
-import 'screens/login_screen.dart';
-import 'screens/home_screen.dart';
-import 'screens/driver_list_screen.dart';
+import 'screens/admin_home_screen.dart';
+import 'screens/availability_screen.dart';
 import 'screens/driver_detail_screen.dart';
-import 'screens/reservation_screen.dart';
+import 'screens/driver_home_screen.dart';
+import 'screens/driver_list_screen.dart';
+import 'screens/home_screen.dart';
+import 'screens/login_screen.dart';
 import 'screens/profile_screen.dart';
+import 'screens/register_screen.dart';
+import 'screens/reservation_screen.dart';
 
 class Routes {
   static const login = '/';
+  static const register = '/register';
   static const home = '/home';
+  static const driverHome = '/driver_home';
+  static const adminHome = '/admin_home';
+  static const availability = '/availability';
   static const drivers = '/drivers';
   static const driverDetail = '/driver_detail';
   static const reservation = '/reservation';
@@ -21,14 +30,22 @@ class AppRouter {
     switch (settings.name) {
       case Routes.login:
         return MaterialPageRoute(builder: (_) => const LoginScreen());
+      case Routes.register:
+        return MaterialPageRoute(builder: (_) => const RegisterScreen());
       case Routes.home:
         return MaterialPageRoute(builder: (_) => const HomeScreen());
+      case Routes.driverHome:
+        return MaterialPageRoute(builder: (_) => const DriverHomeScreen());
+      case Routes.adminHome:
+        return MaterialPageRoute(builder: (_) => const AdminHomeScreen());
+      case Routes.availability:
+        return MaterialPageRoute(builder: (_) => const AvailabilityScreen());
       case Routes.drivers:
         return MaterialPageRoute(builder: (_) => const DriverListScreen());
       case Routes.driverDetail:
-        final driverId = settings.arguments as String;
+        final id = settings.arguments as String;
         return MaterialPageRoute(
-          builder: (_) => DriverDetailScreen(driverId: driverId),
+          builder: (_) => DriverDetailScreen(driverId: id),
         );
       case Routes.reservation:
         final args = settings.arguments as Map<String, dynamic>;
@@ -42,9 +59,8 @@ class AppRouter {
         return MaterialPageRoute(builder: (_) => const ProfileScreen());
       default:
         return MaterialPageRoute(
-          builder: (_) => const Scaffold(
-            body: Center(child: Text('Ruta no encontrada')),
-          ),
+          builder: (_) =>
+              const Scaffold(body: Center(child: Text('Ruta no encontrada'))),
         );
     }
   }

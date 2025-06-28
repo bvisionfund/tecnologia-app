@@ -1,15 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../models/reservation.dart';
+
+import '../app_router.dart';
 import '../models/availability_slot.dart';
+import '../models/reservation.dart';
 import '../providers/auth_provider.dart';
 import '../providers/reservation_provider.dart';
-import '../app_router.dart';
 
 class ReservationScreen extends ConsumerWidget {
   final String driverId;
   final AvailabilitySlot slot;
-  const ReservationScreen({required this.driverId, required this.slot, Key? key}) : super(key: key);
+  const ReservationScreen({
+    required this.driverId,
+    required this.slot,
+    super.key,
+  });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {

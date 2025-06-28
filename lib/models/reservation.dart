@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+
 import 'availability_slot.dart';
 
 class Reservation {
@@ -22,11 +23,20 @@ class Reservation {
     final data = doc.data() as Map<String, dynamic>;
     return Reservation(
       id: doc.id,
-      userId: data['userId'] as String,
-      driverId: data['driverId'] as String,
+      userId: data['userId'],
+      driverId: data['driverId'],
       fechaReserva: (data['fechaReserva'] as Timestamp).toDate(),
-      slot: AvailabilitySlot.fromMap(data['slot'] as Map<String, dynamic>),
-      estado: data['estadoReserva'] as String,
+      slot: AvailabilitySlot.fromMap(data['slot'], data['slotDocId']),
+      estado: data['estado'],
     );
   }
+
+  Map<String, dynamic> toMap() => {
+    'userId': userId,
+    'driverId': driverId,
+    'fechaReserva': Timestamp.fromDate(fechaReserva),
+    'slot': slot.toMap(),
+    'slotDocId': slot.docId,
+    'estado': estado,
+  };
 }
