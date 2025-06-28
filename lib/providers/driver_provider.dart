@@ -17,3 +17,8 @@ final approvedDriversProvider = StreamProvider<List<Driver>>(
 final availableDriversProvider = StreamProvider<List<Driver>>(
   (ref) => ref.watch(firestoreServiceProvider).watchAvailableDrivers(),
 );
+
+/// Provider para traer choferes pendientes de aprobación
+final pendingDriversProvider = StreamProvider<List<Driver>>(
+  (ref) => ref.watch(firestoreServiceProvider).watchPendingDrivers(),
+);

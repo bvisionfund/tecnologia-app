@@ -89,4 +89,22 @@ class FirestoreService {
     final data = res.toMap();
     // similar batch code as antes...
   }
+
+  /// Stream de choferes con estado 'pendiente'
+  Stream<List<Driver>> watchPendingDrivers() {
+    return _db
+        .collection('drivers')
+        .where('estadoAprobacion', isEqualTo: 'pendiente')
+        .snapshots()
+        .map(
+          (snap) => snap.docs.map((doc) => Driver.fromDoc(doc, [])).toList(),
+        );
+  }
+
+  /// Aprueba o rechaza un chofer cambiando su estado en Firestore
+  Future<void> updateDriverApproval(String driverId, bool approved) {
+    return _db.collection('drivers').doc(driverId).update({
+      'estadoAprobacion': approved ? 'aprobado' : 'rechazado',
+    });
+  }
 }
