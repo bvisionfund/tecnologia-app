@@ -12,11 +12,15 @@ import 'screens/my_reservations_screen.dart';
 import 'screens/profile_screen.dart';
 import 'screens/register_screen.dart';
 import 'screens/reservation_screen.dart';
+import 'screens/user/map_driver_list_screen.dart';
+import 'shared/request_closest_driver_screen.dart';
 
 class Routes {
   static const login = '/';
   static const register = '/register';
   static const home = '/home';
+  static const mapDrivers = '/map_drivers';
+  static const requestClosest = '/request_closest_driver';
   static const driverHome = '/driver_home';
   static const adminHome = '/admin_home';
   static const availability = '/availability';
@@ -30,6 +34,12 @@ class Routes {
 class AppRouter {
   static Route<dynamic> generateRoute(RouteSettings settings) {
     switch (settings.name) {
+      case Routes.mapDrivers:
+        return MaterialPageRoute(builder: (_) => const MapDriverListScreen());
+      case Routes.requestClosest:
+        return MaterialPageRoute(
+          builder: (_) => const RequestClosestDriverScreen(),
+        );
       case Routes.login:
         return MaterialPageRoute(builder: (_) => const LoginScreen());
       case Routes.register:

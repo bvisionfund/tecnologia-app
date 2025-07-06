@@ -1,14 +1,36 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:geolocator/geolocator.dart';
 
+import '../../services/location_service.dart';
 import '../app_router.dart';
 import '../providers/auth_provider.dart';
 
 class DriverHomeScreen extends ConsumerWidget {
-  const DriverHomeScreen({super.key});
+  const DriverHomeScreen({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    Future<void> _requestLocationPermission() async {
+      bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+      if (!serviceEnabled) {
+        await Geolocator.openLocationSettings();
+        return;
+      }
+
+      LocationPermission permission = await Geolocator.checkPermission();
+      if (permission == LocationPermission.denied) {
+        permission = await Geolocator.requestPermission();
+      }
+    }
+
+    void _startLocationUpdates() {
+      final uid = ref.read(authStateProvider).value?.uid;
+      if (uid != null) {
+        LocationService().updateDriverLocation(uid);
+      }
+    }
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Panel de Chofer'),

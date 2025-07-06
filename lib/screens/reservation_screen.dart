@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -34,9 +35,17 @@ class ReservationScreen extends ConsumerWidget {
                   id: '',
                   userId: user.uid,
                   driverId: driverId,
-                  fechaReserva: DateTime.now(),
+                  requestTime: DateTime.now(),
+                  pickupTime: slot.inicio,
+                  pickupAddress: 'Por definir',
+                  pickupLocation: const GeoPoint(
+                    0.0,
+                    0.0,
+                  ), // valor temporal o real
+                  estimatedFare: 5.0,
+                  status: ReservationStatus.accepted,
+                  paymentStatus: PaymentStatus.pending,
                   slot: slot,
-                  estado: 'pendiente',
                 );
                 await ref.read(createReservationProvider(res).future);
                 Navigator.pushNamed(context, Routes.myReservation);

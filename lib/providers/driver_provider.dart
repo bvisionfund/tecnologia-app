@@ -22,3 +22,9 @@ final availableDriversProvider = StreamProvider<List<Driver>>(
 final pendingDriversProvider = StreamProvider<List<Driver>>(
   (ref) => ref.watch(firestoreServiceProvider).watchPendingDrivers(),
 );
+
+/// Proveedor para obtener el detalle de un chofer específico
+final driverDetailProvider = FutureProvider.family<Driver, String>(
+  (ref, driverId) =>
+      ref.watch(firestoreServiceProvider).fetchDriverDetail(driverId),
+);

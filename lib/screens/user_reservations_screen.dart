@@ -33,11 +33,9 @@ class UserReservationsScreen extends ConsumerWidget {
                 margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                 child: ListTile(
                   title: Text(
-                    'Reserva: ${r.fechaReserva.toLocal().toString().split('.')[0]}',
+                    'Reserva: ${r.pickupTime.toLocal().toString().split('.')[0]}',
                   ),
-                  subtitle: Text(
-                    'Chofer: ${r.slot.docId}  Estado: ${r.estado}',
-                  ),
+                  subtitle: Text('Chofer: ${r.slot}  Estado: ${r.status}'),
                   // podrías navegar a un detail con más info
                 ),
               );

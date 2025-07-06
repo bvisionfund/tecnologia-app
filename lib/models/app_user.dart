@@ -1,7 +1,10 @@
+// lib/models/app_user.dart
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class AppUser {
   final String id;
+  final String username; // opcional si usas login por usuario
   final String nombre;
   final String apellido;
   final String correo;
@@ -10,6 +13,7 @@ class AppUser {
 
   AppUser({
     required this.id,
+    this.username = '',
     required this.nombre,
     required this.apellido,
     required this.correo,
@@ -18,14 +22,24 @@ class AppUser {
   });
 
   factory AppUser.fromDoc(DocumentSnapshot doc) {
-    final data = doc.data() as Map<String, dynamic>;
+    final d = doc.data()! as Map<String, dynamic>;
     return AppUser(
       id: doc.id,
-      nombre: data['nombre'] as String,
-      apellido: data['apellido'] as String,
-      correo: data['correo'] as String,
-      telefono: data['telefono'] as String,
-      fechaRegistro: data['fechaRegistro'] as Timestamp,
+      username: d['username'] as String? ?? '',
+      nombre: d['nombre'] as String,
+      apellido: d['apellido'] as String,
+      correo: d['correo'] as String,
+      telefono: d['telefono'] as String,
+      fechaRegistro: d['fechaRegistro'] as Timestamp,
     );
   }
+
+  Map<String, dynamic> toMap() => {
+    if (username.isNotEmpty) 'username': username,
+    'nombre': nombre,
+    'apellido': apellido,
+    'correo': correo,
+    'telefono': telefono,
+    'fechaRegistro': fechaRegistro,
+  };
 }

@@ -8,6 +8,7 @@ final reservationServiceProvider = Provider<FirestoreService>(
 );
 final firestoreServiceProvider = Provider((_) => FirestoreService());
 
+/// Crea una nueva reserva y devuelve cuando termine
 final createReservationProvider = FutureProvider.family<void, Reservation>(
   (ref, res) => ref.read(reservationServiceProvider).createReservation(res),
 );
