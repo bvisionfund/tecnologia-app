@@ -38,10 +38,30 @@ class DriverReservationsScreen extends ConsumerWidget {
           final reservas = snapshot.data!.docs.map((doc) {
             try {
               final r = Reservation.fromDoc(doc);
-              return ListTile(
-                title: Text('Cliente: ${r.userId.substring(0, 6)}...'),
-                subtitle: Text('Fecha: ${r.pickupTime.toLocal()}'),
-                trailing: Text(r.status.name),
+
+              return FutureBuilder<DocumentSnapshot>(
+                future: FirebaseFirestore.instance
+                    .collection('users')
+                    .doc(r.userId)
+                    .get(),
+                builder: (context, userSnapshot) {
+                  if (userSnapshot.connectionState == ConnectionState.waiting) {
+                    return const ListTile(title: Text('Cargando cliente...'));
+                  }
+
+                  final userData =
+                      userSnapshot.data?.data() as Map<String, dynamic>?;
+
+                  final name = userData != null && userData['nombre'] != null
+                      ? userData['nombre'] as String
+                      : 'Sin nombre';
+
+                  return ListTile(
+                    title: Text('Cliente: $name'),
+                    subtitle: Text('Fecha: ${r.pickupTime.toLocal()}'),
+                    trailing: Text(r.status.name),
+                  );
+                },
               );
             } catch (e) {
               print('Error al convertir reserva: $e');

@@ -111,10 +111,12 @@ class FirestoreService {
   /// Stream de las reservas de un usuario
   Stream<List<Reservation>> watchUserReservations(String userId) {
     return _db
-        .collection('users')
-        .doc(userId)
         .collection('reservations')
-        .orderBy('fechaReserva', descending: true)
+        .where('userId', isEqualTo: userId)
+        .orderBy(
+          'pickupTime',
+          descending: true,
+        ) // o 'fechaReserva' si prefieres
         .snapshots()
         .map(
           (snap) => snap.docs.map((doc) => Reservation.fromDoc(doc)).toList(),
