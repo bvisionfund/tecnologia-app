@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:permission_handler/permission_handler.dart';
 
@@ -16,6 +17,35 @@ class _MapDriverListScreenState extends ConsumerState<MapDriverListScreen> {
   late GoogleMapController _mapController;
   final Set<Marker> _markers = {};
   bool _permisosOtorgados = false;
+
+  Future<void> _moverCamaraAUbicacionActual() async {
+    final position = await Geolocator.getCurrentPosition(
+      desiredAccuracy: LocationAccuracy.high,
+    );
+
+    _mapController.animateCamera(
+      CameraUpdate.newLatLngZoom(
+        LatLng(position.latitude, position.longitude),
+        13,
+      ),
+    );
+  }
+
+  LatLngBounds _crearLimitesDesdeMarcadores(Set<Marker> markers) {
+    final latitudes = markers.map((m) => m.position.latitude);
+    final longitudes = markers.map((m) => m.position.longitude);
+
+    final southwest = LatLng(
+      latitudes.reduce((a, b) => a < b ? a : b),
+      longitudes.reduce((a, b) => a < b ? a : b),
+    );
+    final northeast = LatLng(
+      latitudes.reduce((a, b) => a > b ? a : b),
+      longitudes.reduce((a, b) => a > b ? a : b),
+    );
+
+    return LatLngBounds(southwest: southwest, northeast: northeast);
+  }
 
   @override
   void initState() {
@@ -67,6 +97,14 @@ class _MapDriverListScreenState extends ConsumerState<MapDriverListScreen> {
                 ..clear()
                 ..addAll(markers);
             });
+            if (_markers.isNotEmpty) {
+              final bounds = _crearLimitesDesdeMarcadores(_markers);
+              _mapController.animateCamera(
+                CameraUpdate.newLatLngBounds(bounds, 50),
+              );
+            } else {
+              _moverCamaraAUbicacionActual();
+            }
           }
         });
   }
@@ -81,7 +119,10 @@ class _MapDriverListScreenState extends ConsumerState<MapDriverListScreen> {
                 target: LatLng(-0.1807, -78.4678), // Quito
                 zoom: 7,
               ),
-              onMapCreated: (controller) => _mapController = controller,
+              onMapCreated: (controller) async {
+                _mapController = controller;
+                await _moverCamaraAUbicacionActual(); // 👉 opcional si quieres mostrar Ibarra por defecto
+              },
               markers: _markers,
               myLocationEnabled: true,
             )

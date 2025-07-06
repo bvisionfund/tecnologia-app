@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geolocator/geolocator.dart';
@@ -15,11 +17,18 @@ class DriverHomeScreen extends ConsumerStatefulWidget {
 
 class _DriverHomeScreenState extends ConsumerState<DriverHomeScreen> {
   bool _locationUpdated = false;
+  Timer? _locationTimer; // 👉 Declaración del Timer
 
   @override
   void initState() {
     super.initState();
     _handleLocationPermissionAndUpdate();
+  }
+
+  @override
+  void dispose() {
+    _locationTimer?.cancel(); // 👉 Limpieza al salir de la pantalla
+    super.dispose();
   }
 
   Future<bool> ensureLocationPermission() async {
@@ -32,9 +41,7 @@ class _DriverHomeScreenState extends ConsumerState<DriverHomeScreen> {
     LocationPermission permission = await Geolocator.checkPermission();
     if (permission == LocationPermission.denied) {
       permission = await Geolocator.requestPermission();
-      if (permission == LocationPermission.denied) {
-        return false;
-      }
+      if (permission == LocationPermission.denied) return false;
     }
 
     if (permission == LocationPermission.deniedForever) {
@@ -49,24 +56,18 @@ class _DriverHomeScreenState extends ConsumerState<DriverHomeScreen> {
     final user = ref.read(authStateProvider).value;
     if (user == null) return;
 
-    bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
-    if (!serviceEnabled) {
-      await Geolocator.openLocationSettings();
-      return;
-    }
+    final granted = await ensureLocationPermission();
+    if (!granted) return;
 
-    LocationPermission permission = await Geolocator.checkPermission();
-    if (permission == LocationPermission.denied) {
-      permission = await Geolocator.requestPermission();
-      if (permission == LocationPermission.denied) return;
-    }
-    if (permission == LocationPermission.deniedForever) {
-      await Geolocator.openAppSettings();
-      return;
-    }
-
+    // Primera actualización
     await LocationService().updateDriverLocation(user.uid);
     setState(() => _locationUpdated = true);
+
+    // Actualización periódica cada 10 segundos
+    _locationTimer?.cancel();
+    _locationTimer = Timer.periodic(const Duration(seconds: 10), (_) async {
+      await LocationService().updateDriverLocation(user.uid);
+    });
   }
 
   @override
