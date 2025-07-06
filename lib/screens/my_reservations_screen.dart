@@ -32,10 +32,8 @@ class UserReservationsScreen extends ConsumerWidget {
               return Card(
                 margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                 child: ListTile(
-                  title: Text(
-                    'Reserva: ${r.pickupTime.toLocal().toString().split('.')[0]}',
-                  ),
-                  subtitle: Text('Chofer: ${r.slot}  Estado: ${r.status}'),
+                  title: Text('Reserva:${r.driverId}'),
+                  subtitle: Text('Estado: ${r.status.name}'),
                   // podrías navegar a un detail con más info
                 ),
               );

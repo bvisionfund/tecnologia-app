@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../models/reservation.dart';
@@ -9,9 +10,13 @@ final reservationServiceProvider = Provider<FirestoreService>(
 final firestoreServiceProvider = Provider((_) => FirestoreService());
 
 /// Crea una nueva reserva y devuelve cuando termine
-final createReservationProvider = FutureProvider.family<void, Reservation>(
-  (ref, res) => ref.read(reservationServiceProvider).createReservation(res),
-);
+final createReservationProvider = FutureProvider.family<void, Reservation>((
+  ref,
+  res,
+) async {
+  final firestore = FirebaseFirestore.instance;
+  await firestore.collection('reservations').add(res.toMap());
+});
 
 /// Lista de reservas para un usuario dado
 final userReservationsProvider =

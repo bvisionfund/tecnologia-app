@@ -54,8 +54,12 @@ class Reservation {
       id: doc.id,
       userId: d['userId'] as String,
       driverId: d['driverId'] as String,
-      requestTime: (d['requestTime'] as Timestamp).toDate(),
-      pickupTime: (d['pickupTime'] as Timestamp).toDate(),
+      requestTime: d['requestTime'] != null
+          ? (d['requestTime'] as Timestamp).toDate()
+          : DateTime.now(), // o null si haces requestTime nullable
+      pickupTime: d['pickupTime'] != null
+          ? (d['pickupTime'] as Timestamp).toDate()
+          : DateTime.now(),
       pickupAddress: d['pickupAddress'] as String,
       pickupLocation: d['pickupLocation'] as GeoPoint,
       dropoffAddress: d['dropoffAddress'] as String?,

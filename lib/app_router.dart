@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:tecnologia_app/screens/driver_reservations_screen.dart';
 
 import 'models/availability_slot.dart';
 import 'screens/admin_home_screen.dart';
@@ -29,11 +30,16 @@ class Routes {
   static const reservation = '/reservation';
   static const myReservation = '/my_reservation';
   static const profile = '/profile';
+  static const driverReservations = '/driver_reservations';
 }
 
 class AppRouter {
   static Route<dynamic> generateRoute(RouteSettings settings) {
     switch (settings.name) {
+      case Routes.driverReservations:
+        return MaterialPageRoute(
+          builder: (_) => const DriverReservationsScreen(),
+        );
       case Routes.mapDrivers:
         return MaterialPageRoute(builder: (_) => const MapDriverListScreen());
       case Routes.requestClosest:

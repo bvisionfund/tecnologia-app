@@ -69,6 +69,11 @@ class HomeScreen extends ConsumerWidget {
           ),
           const SizedBox(height: 20),
           ElevatedButton(
+            onPressed: () => Navigator.pushNamed(context, Routes.myReservation),
+            child: const Text('Mis reservas'),
+          ),
+          const SizedBox(height: 20),
+          ElevatedButton(
             onPressed: () async {
               final granted = await ensureLocationPermission();
               ScaffoldMessenger.of(context).showSnackBar(
