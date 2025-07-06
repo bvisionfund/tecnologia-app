@@ -1,7 +1,19 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../services/firestore_service.dart';
-import '../models/reservation.dart';
 
-final reservationServiceProvider = Provider<FirestoreService>((ref) => FirestoreService());
+import '../models/reservation.dart';
+import '../services/firestore_service.dart';
+
+final reservationServiceProvider = Provider<FirestoreService>(
+  (ref) => FirestoreService(),
+);
+final firestoreServiceProvider = Provider((_) => FirestoreService());
+
 final createReservationProvider = FutureProvider.family<void, Reservation>(
-    (ref, res) => ref.read(reservationServiceProvider).createReservation(res));
+  (ref, res) => ref.read(reservationServiceProvider).createReservation(res),
+);
+
+/// Lista de reservas para un usuario dado
+final userReservationsProvider =
+    StreamProvider.family<List<Reservation>, String>((ref, userId) {
+      return ref.watch(firestoreServiceProvider).watchUserReservations(userId);
+    });

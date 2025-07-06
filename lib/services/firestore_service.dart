@@ -107,4 +107,17 @@ class FirestoreService {
       'estadoAprobacion': approved ? 'aprobado' : 'rechazado',
     });
   }
+
+  /// Stream de las reservas de un usuario
+  Stream<List<Reservation>> watchUserReservations(String userId) {
+    return _db
+        .collection('users')
+        .doc(userId)
+        .collection('reservations')
+        .orderBy('fechaReserva', descending: true)
+        .snapshots()
+        .map(
+          (snap) => snap.docs.map((doc) => Reservation.fromDoc(doc)).toList(),
+        );
+  }
 }

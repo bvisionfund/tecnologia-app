@@ -8,6 +8,7 @@ import 'screens/driver_home_screen.dart';
 import 'screens/driver_list_screen.dart';
 import 'screens/home_screen.dart';
 import 'screens/login_screen.dart';
+import 'screens/my_reservations_screen.dart';
 import 'screens/profile_screen.dart';
 import 'screens/register_screen.dart';
 import 'screens/reservation_screen.dart';
@@ -22,6 +23,7 @@ class Routes {
   static const drivers = '/drivers';
   static const driverDetail = '/driver_detail';
   static const reservation = '/reservation';
+  static const myReservation = '/my_reservation';
   static const profile = '/profile';
 }
 
@@ -34,6 +36,10 @@ class AppRouter {
         return MaterialPageRoute(builder: (_) => const RegisterScreen());
       case Routes.home:
         return MaterialPageRoute(builder: (_) => const HomeScreen());
+      case Routes.myReservation:
+        return MaterialPageRoute(
+          builder: (_) => const UserReservationsScreen(),
+        );
       case Routes.driverHome:
         return MaterialPageRoute(builder: (_) => const DriverHomeScreen());
       case Routes.adminHome:

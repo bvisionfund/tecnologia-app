@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../providers/auth_provider.dart';
+
 import '../app_router.dart';
+import '../providers/auth_provider.dart';
 
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -19,7 +20,7 @@ class HomeScreen extends ConsumerWidget {
               await ref.read(authProvider).signOut();
               Navigator.pushReplacementNamed(context, Routes.login);
             },
-          )
+          ),
         ],
       ),
       body: Center(

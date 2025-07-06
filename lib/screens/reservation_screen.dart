@@ -39,7 +39,7 @@ class ReservationScreen extends ConsumerWidget {
                   estado: 'pendiente',
                 );
                 await ref.read(createReservationProvider(res).future);
-                Navigator.popUntil(context, ModalRoute.withName(Routes.home));
+                Navigator.pushNamed(context, Routes.myReservation);
               },
               child: const Text('Reservar'),
             ),
