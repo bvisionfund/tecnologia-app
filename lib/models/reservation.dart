@@ -6,6 +6,7 @@ import 'availability_slot.dart';
 
 enum ReservationStatus {
   requested,
+  pending,
   accepted,
   arrived,
   inProgress,

@@ -43,7 +43,7 @@ class ReservationScreen extends ConsumerWidget {
                     0.0,
                   ), // valor temporal o real
                   estimatedFare: 5.0,
-                  status: ReservationStatus.accepted,
+                  status: ReservationStatus.pending,
                   paymentStatus: PaymentStatus.pending,
                   slot: slot,
                 );
