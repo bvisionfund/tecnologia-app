@@ -11,6 +11,7 @@ enum ReservationStatus {
   inProgress,
   completed,
   cancelled,
+  rejected,
 }
 
 enum PaymentStatus { pending, paid, failed }

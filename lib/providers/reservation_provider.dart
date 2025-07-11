@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:tecnologia_app/providers/auth_provider.dart';
 
 import '../models/reservation.dart';
 import '../services/firestore_service.dart';
@@ -23,3 +24,11 @@ final userReservationsProvider =
     StreamProvider.family<List<Reservation>, String>((ref, userId) {
       return ref.watch(firestoreServiceProvider).watchUserReservations(userId);
     });
+
+/// Lista de reservas para un conductor dado
+final myReservationsProvider = StreamProvider<List<Reservation>>((ref) {
+  final user = ref.watch(authStateProvider).value!;
+  return ref
+      .watch(firestoreServiceProvider)
+      .watchReservationsByClient(user.uid);
+});

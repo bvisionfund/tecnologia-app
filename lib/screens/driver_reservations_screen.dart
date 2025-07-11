@@ -55,11 +55,35 @@ class DriverReservationsScreen extends ConsumerWidget {
                   final name = userData != null && userData['nombre'] != null
                       ? userData['nombre'] as String
                       : 'Sin nombre';
+                  // pon dos botones para aceptar o rechazar la reserva
 
                   return ListTile(
                     title: Text('Cliente: $name'),
                     subtitle: Text('Fecha: ${r.pickupTime.toLocal()}'),
-                    trailing: Text(r.status.name),
+                    trailing: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        //  Text(r.status.name),
+                        IconButton(
+                          icon: const Icon(Icons.check, color: Colors.green),
+                          onPressed: () async {
+                            await FirebaseFirestore.instance
+                                .collection('reservations')
+                                .doc(r.id)
+                                .update({'status': 'accepted'});
+                          },
+                        ),
+                        IconButton(
+                          icon: const Icon(Icons.close, color: Colors.red),
+                          onPressed: () async {
+                            await FirebaseFirestore.instance
+                                .collection('reservations')
+                                .doc(r.id)
+                                .update({'status': 'rejected'});
+                          },
+                        ),
+                      ],
+                    ),
                   );
                 },
               );

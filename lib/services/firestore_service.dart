@@ -122,4 +122,26 @@ class FirestoreService {
           (snap) => snap.docs.map((doc) => Reservation.fromDoc(doc)).toList(),
         );
   }
+
+  //updateReservationStatus
+  Future<void> updateReservationStatus(
+    String reservationId,
+    ReservationStatus status,
+  ) async {
+    await _db.collection('reservations').doc(reservationId).update({
+      'status': status.name,
+    });
+  }
+
+  /// Stream de reservas por cliente (conductor)
+  Stream<List<Reservation>> watchReservationsByClient(String clientId) {
+    return _db
+        .collection('reservations')
+        .where('userId', isEqualTo: clientId)
+        .orderBy('pickupTime', descending: true)
+        .snapshots()
+        .map(
+          (snap) => snap.docs.map((doc) => Reservation.fromDoc(doc)).toList(),
+        );
+  }
 }

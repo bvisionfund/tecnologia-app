@@ -20,29 +20,38 @@ class UserReservationsScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(title: const Text('Mis Reservas')),
-      body: reservationsAsync.when(
-        data: (reservas) {
-          if (reservas.isEmpty) {
-            return const Center(child: Text('No tienes reservas'));
-          }
-          return ListView.builder(
-            itemCount: reservas.length,
-            itemBuilder: (_, i) {
-              final r = reservas[i];
-              return Card(
-                margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                child: ListTile(
-                  title: Text('Reserva:${r.driverId}'),
-                  subtitle: Text('Estado: ${r.status.name}'),
-                  // podrías navegar a un detail con más info
-                ),
-              );
-            },
-          );
-        },
-        loading: () => const Center(child: CircularProgressIndicator()),
-        error: (e, _) => Center(child: Text('Error: $e')),
-      ),
+      body: ref
+          .watch(myReservationsProvider)
+          .when(
+            data: (reservas) => ListView(
+              children: reservas
+                  .map(
+                    (r) => ListTile(
+                      title: Text('Chofer: ${r.driverId}'),
+                      subtitle: Text(
+                        'Hora: ${r.slot?.inicio} - ${r.slot?.fin}',
+                      ),
+                      trailing: Text(
+                        r.status == 'pending'
+                            ? 'Pendiente'
+                            : r.status == 'accepted'
+                            ? 'Aceptada'
+                            : 'Rechazada',
+                        style: TextStyle(
+                          color: r.status == 'accepted'
+                              ? Colors.green
+                              : r.status == 'rejected'
+                              ? Colors.red
+                              : Colors.orange,
+                        ),
+                      ),
+                    ),
+                  )
+                  .toList(),
+            ),
+            loading: () => CircularProgressIndicator(),
+            error: (e, _) => Text('Error: $e'),
+          ),
     );
   }
 }
