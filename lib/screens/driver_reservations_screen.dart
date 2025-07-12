@@ -19,6 +19,7 @@ class DriverReservationsScreen extends ConsumerWidget {
     final stream = FirebaseFirestore.instance
         .collection('reservations')
         .where('driverId', isEqualTo: uid)
+        .where('status', isEqualTo: ReservationStatus.pending.name)
         .orderBy('pickupTime', descending: true)
         .snapshots();
 
