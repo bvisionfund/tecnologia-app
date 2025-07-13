@@ -1,3 +1,5 @@
+// lib/screens/driver_list_screen.dart
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -6,7 +8,8 @@ import '../providers/driver_provider.dart';
 import '../widgets/driver_card.dart';
 
 class DriverListScreen extends ConsumerWidget {
-  const DriverListScreen({super.key});
+  // static const routeName = Routes.driverList;
+  const DriverListScreen({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -18,10 +21,14 @@ class DriverListScreen extends ConsumerWidget {
           if (drivers.isEmpty) {
             return const Center(child: Text('No hay choferes disponibles'));
           }
-          return ListView(
-            children: drivers
-                .map(
-                  (d) => DriverCard(
+          return ListView.builder(
+            padding: const EdgeInsets.symmetric(vertical: 8),
+            itemCount: drivers.length,
+            itemBuilder: (context, index) {
+              final d = drivers[index];
+              return Column(
+                children: [
+                  DriverCard(
                     driver: d,
                     onTap: () => Navigator.pushNamed(
                       context,
@@ -29,8 +36,22 @@ class DriverListScreen extends ConsumerWidget {
                       arguments: d.id,
                     ),
                   ),
-                )
-                .toList(),
+                  const SizedBox(height: 4),
+                  ElevatedButton.icon(
+                    icon: const Icon(Icons.star),
+                    label: const Text('Ver calificaciones'),
+                    onPressed: () {
+                      Navigator.pushNamed(
+                        context,
+                        Routes.driverRatings,
+                        arguments: d.id,
+                      );
+                    },
+                  ),
+                  const Divider(thickness: 1),
+                ],
+              );
+            },
           );
         },
         loading: () => const Center(child: CircularProgressIndicator()),
