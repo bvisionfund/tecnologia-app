@@ -160,11 +160,13 @@ class _DriverHomeScreenState extends ConsumerState<DriverHomeScreen> {
                     .get(),
                 builder: (context, userSnap) {
                   String clientName = 'Cargando...';
+                  String clientPhone = 'Cargando...';
                   if (userSnap.connectionState == ConnectionState.done &&
                       userSnap.hasData &&
                       userSnap.data!.data() != null) {
                     final data = userSnap.data!.data()! as Map<String, dynamic>;
                     clientName = data['nombre'] as String? ?? 'Sin nombre';
+                    clientPhone = data['telefono'] as String? ?? 'Sin Teléfono';
                   }
 
                   return Card(
@@ -199,6 +201,7 @@ class _DriverHomeScreenState extends ConsumerState<DriverHomeScreen> {
                           builder: (_) => ReservationDetailSheet(
                             reservation: r,
                             clientName: clientName,
+                            clientPhone: clientPhone,
                           ),
                         );
                       },
