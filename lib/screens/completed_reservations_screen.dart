@@ -31,11 +31,13 @@ class CompletedReservationsScreen extends ConsumerWidget {
       body: StreamBuilder<QuerySnapshot>(
         stream: stream,
         builder: (context, snap) {
+          if (snap.hasError) {
+            return Center(child: Text('Error: \${snap.error}'));
+          }
           if (snap.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
           }
           final docs = snap.data?.docs ?? [];
-
           if (docs.isEmpty) {
             return const Center(child: Text('No tienes reservas completadas.'));
           }
@@ -43,25 +45,43 @@ class CompletedReservationsScreen extends ConsumerWidget {
             itemCount: docs.length,
             itemBuilder: (context, i) {
               final r = Reservation.fromDoc(docs[i]);
-
-              return Card(
-                margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
-                child: ListTile(
-                  title: Text('Chofer: ${r.driverId}'),
-                  subtitle: Text(
-                    '${r.pickupTime.toLocal()} → ${r.dropoffAddress ?? 'Sin destino'}',
-                  ),
-                  trailing: ElevatedButton(
-                    onPressed: () {
-                      Navigator.pushNamed(
-                        context,
-                        Routes.rateDriver,
-                        arguments: r,
-                      );
-                    },
-                    child: const Text('Calificar chofer'),
-                  ),
-                ),
+              return FutureBuilder<DocumentSnapshot>(
+                future: FirebaseFirestore.instance
+                    .collection('drivers')
+                    .doc(r.driverId)
+                    .get(),
+                builder: (context, driverSnap) {
+                  String driverName = 'Cargando...';
+                  if (driverSnap.connectionState == ConnectionState.done &&
+                      driverSnap.hasData &&
+                      driverSnap.data!.data() != null) {
+                    final data =
+                        driverSnap.data!.data() as Map<String, dynamic>;
+                    driverName = data['nombre'] as String? ?? 'Sin nombre';
+                  }
+                  return Card(
+                    margin: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 6,
+                    ),
+                    child: ListTile(
+                      title: Text('Chofer: $driverName'),
+                      subtitle: Text(
+                        '${r.pickupTime.toLocal()} → ${r.dropoffAddress ?? 'Sin destino'}',
+                      ),
+                      trailing: ElevatedButton(
+                        onPressed: () {
+                          Navigator.pushNamed(
+                            context,
+                            Routes.rateDriver,
+                            arguments: r,
+                          );
+                        },
+                        child: const Text('Calificar chofer'),
+                      ),
+                    ),
+                  );
+                },
               );
             },
           );
