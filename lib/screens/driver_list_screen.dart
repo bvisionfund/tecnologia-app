@@ -1,5 +1,6 @@
 // lib/screens/driver_list_screen.dart
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -27,6 +28,7 @@ class DriverListScreen extends ConsumerWidget {
             itemBuilder: (context, index) {
               final d = drivers[index];
               return Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   DriverCard(
                     driver: d,
@@ -37,6 +39,47 @@ class DriverListScreen extends ConsumerWidget {
                     ),
                   ),
                   const SizedBox(height: 4),
+                  // Estrella de calificación promedio
+                  FutureBuilder<QuerySnapshot>(
+                    future: FirebaseFirestore.instance
+                        .collection('ratings')
+                        .where('rateeId', isEqualTo: d.id)
+                        .get(),
+                    builder: (context, ratingSnap) {
+                      if (ratingSnap.connectionState ==
+                          ConnectionState.waiting) {
+                        return const Center(
+                          child: SizedBox(
+                            height: 24,
+                            width: 24,
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          ),
+                        );
+                      }
+                      final docs = ratingSnap.data?.docs ?? [];
+                      double avg = 0;
+                      if (docs.isNotEmpty) {
+                        final total = docs.fold<double>(
+                          0,
+                          (sum, doc) => sum + (doc['rating'] as num).toDouble(),
+                        );
+                        avg = total / docs.length;
+                      }
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 4),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: List.generate(5, (i) {
+                            return Icon(
+                              i < avg.round() ? Icons.star : Icons.star_border,
+                              color: Colors.amber,
+                              size: 20,
+                            );
+                          }),
+                        ),
+                      );
+                    },
+                  ),
                   ElevatedButton.icon(
                     icon: const Icon(Icons.star),
                     label: const Text('Ver calificaciones'),
