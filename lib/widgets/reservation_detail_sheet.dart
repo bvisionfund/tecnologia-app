@@ -15,23 +15,32 @@ class ReservationDetailSheet extends StatelessWidget {
     required this.clientName,
   }) : super(key: key);
 
-  /// Construye la URL de Google Maps para navegar a [destination].
-  Future<void> _openMaps(String destination) async {
-    final encoded = Uri.encodeComponent(destination);
-    final uri = Uri.parse(
-      'https://www.google.com/maps/dir/?api=1&destination=$encoded',
+  Future<void> _openMaps() async {
+    final lat = reservation.pickupLocation.latitude;
+    final lng = reservation.pickupLocation.longitude;
+
+    // Intento abrir en la app nativa de Google Maps (URI scheme)
+    final navUri = Uri.parse('google.navigation:q=$lat,$lng');
+    if (await canLaunchUrl(navUri)) {
+      await launchUrl(navUri, mode: LaunchMode.externalApplication);
+      return;
+    }
+
+    // Si no funciona, usamos la versión web de Google Maps
+    final webUri = Uri.parse(
+      'https://www.google.com/maps/dir/?api=1&destination=$lat,$lng',
     );
-    if (!await canLaunchUrl(uri)) {
+    if (await canLaunchUrl(webUri)) {
+      await launchUrl(webUri, mode: LaunchMode.externalApplication);
+    } else {
       throw 'No se pudo abrir Google Maps';
     }
-    await launchUrl(uri);
   }
 
   @override
   Widget build(BuildContext context) {
     final pickup = reservation.pickupTime.toLocal().toString();
-    final destination = 'reservation.destination ' ?? 'No especificado';
-    final notes = 'reservation.notes' ?? '—';
+    final destination = reservation.pickupLocation ?? 'No especificado';
 
     return Padding(
       padding: const EdgeInsets.all(16),
@@ -48,17 +57,10 @@ class ReservationDetailSheet extends StatelessWidget {
           const SizedBox(height: 4),
           Text('Destino: $destination'),
           const SizedBox(height: 12),
-          const Text(
-            'Notas adicionales:',
-            style: TextStyle(fontWeight: FontWeight.bold),
-          ),
-          const SizedBox(height: 4),
-          Text(notes),
-          const SizedBox(height: 16),
           ElevatedButton.icon(
             icon: const Icon(Icons.navigation),
             label: const Text('Abrir en Maps'),
-            onPressed: () => _openMaps(destination),
+            onPressed: _openMaps,
           ),
         ],
       ),

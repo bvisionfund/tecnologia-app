@@ -183,7 +183,7 @@ class _DriverHomeScreenState extends ConsumerState<DriverHomeScreen> {
                         style: const TextStyle(fontWeight: FontWeight.bold),
                       ),
                       subtitle: Text(
-                        '${r.pickupTime.toLocal()} → ${'r.destination' ?? 'Sin destino'}',
+                        '${r.pickupTime.toLocal()} → ${r.pickupLocation ?? 'Sin destino'}',
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                       ),
