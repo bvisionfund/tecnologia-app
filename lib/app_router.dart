@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:tecnologia_app/models/reservation.dart';
+import 'package:tecnologia_app/screens/completed_reservations_screen.dart';
 import 'package:tecnologia_app/screens/driver_reservations_screen.dart';
 import 'package:tecnologia_app/screens/rate_client_screen.dart';
+import 'package:tecnologia_app/screens/rate_driver_screen.dart';
 
 import 'models/availability_slot.dart';
 import 'screens/admin_home_screen.dart';
@@ -31,7 +33,9 @@ class Routes {
   static const driverDetail = '/driver_detail';
   static const reservation = '/reservation';
   static const myReservation = '/my_reservation';
+  static const completedReservations = '/completed_reservation';
   static const rateClient = '/rate_client';
+  static const rateDriver = '/rate_driver';
   static const profile = '/profile';
   static const driverReservations = '/driver_reservations';
 }
@@ -39,6 +43,15 @@ class Routes {
 class AppRouter {
   static Route<dynamic> generateRoute(RouteSettings settings) {
     switch (settings.name) {
+      case Routes.rateDriver:
+        final reservation = settings.arguments as Reservation;
+        return MaterialPageRoute(
+          builder: (_) => RateDriverScreen(reservation: reservation),
+        );
+      case Routes.completedReservations:
+        return MaterialPageRoute(
+          builder: (_) => const CompletedReservationsScreen(),
+        );
       case Routes.rateClient:
         final reservation = settings.arguments as Reservation;
         return MaterialPageRoute(

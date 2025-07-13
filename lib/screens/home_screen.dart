@@ -88,6 +88,12 @@ class HomeScreen extends ConsumerWidget {
             },
             child: const Text('Activar ubicación'),
           ),
+          const SizedBox(height: 20),
+          ElevatedButton(
+            onPressed: () =>
+                Navigator.pushNamed(context, Routes.completedReservations),
+            child: const Text('Reservas Completadas'),
+          ),
         ],
       ),
       drawer: Drawer(
