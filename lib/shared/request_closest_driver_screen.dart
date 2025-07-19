@@ -1,13 +1,15 @@
+// lib/screens/request_closest_driver_screen.dart
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geolocator/geolocator.dart';
 
-import '../../models/reservation.dart';
-import '../../providers/auth_provider.dart';
+import '../models/reservation.dart';
+import '../providers/auth_provider.dart';
 
 class RequestClosestDriverScreen extends ConsumerStatefulWidget {
-  const RequestClosestDriverScreen({super.key});
+  const RequestClosestDriverScreen({Key? key}) : super(key: key);
 
   @override
   ConsumerState<RequestClosestDriverScreen> createState() =>
@@ -26,33 +28,36 @@ class _RequestClosestDriverScreenState
     });
 
     try {
+      // Obtener posición del usuario
       Position userPos = await Geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.high,
       );
       final userLocation = GeoPoint(userPos.latitude, userPos.longitude);
 
+      // Obtener choferes aprobados
       final snapshot = await FirebaseFirestore.instance
           .collection('drivers')
           .where('estadoAprobacion', isEqualTo: 'aprobado')
           .get();
 
-      GeoPoint? closest;
+      GeoPoint? closestLoc;
       String? closestDriverId;
       double minDistance = double.infinity;
 
+      // Calcular el chofer más cercano
       for (var doc in snapshot.docs) {
         final data = doc.data();
-        final GeoPoint? location = data['currentLocation'];
-        if (location == null) continue;
-        final distance = Geolocator.distanceBetween(
+        final loc = data['currentLocation'] as GeoPoint?;
+        if (loc == null) continue;
+        final dist = Geolocator.distanceBetween(
           userLocation.latitude,
           userLocation.longitude,
-          location.latitude,
-          location.longitude,
+          loc.latitude,
+          loc.longitude,
         );
-        if (distance < minDistance) {
-          minDistance = distance;
-          closest = location;
+        if (dist < minDistance) {
+          minDistance = dist;
+          closestLoc = loc;
           closestDriverId = doc.id;
         }
       }
@@ -62,6 +67,7 @@ class _RequestClosestDriverScreenState
         return;
       }
 
+      // Obtener UID del usuario
       final userId = ref.read(authStateProvider).value?.uid;
       if (userId == null) {
         setState(() => _message = 'Usuario no autenticado.');
@@ -69,23 +75,18 @@ class _RequestClosestDriverScreenState
       }
 
       final now = DateTime.now();
-      await FirebaseFirestore.instance
-          .collection('users')
-          .doc(userId)
-          .collection('reservations')
-          .add({
-            'userId': userId,
-            'driverId': closestDriverId,
-            'requestTime': Timestamp.now(),
-            'pickupTime': Timestamp.fromDate(
-              now.add(const Duration(minutes: 5)),
-            ),
-            'pickupAddress': 'Ubicación actual',
-            'pickupLocation': userLocation,
-            'estimatedFare': 5.0,
-            'status': ReservationStatus.requested.name,
-            'paymentStatus': PaymentStatus.pending.name,
-          });
+      // Guardar en colección top-level 'reservations'
+      await FirebaseFirestore.instance.collection('reservations').add({
+        'userId': userId,
+        'driverId': closestDriverId,
+        'requestTime': Timestamp.fromDate(now),
+        'pickupTime': Timestamp.fromDate(now.add(const Duration(minutes: 5))),
+        'pickupAddress': 'Ubicación actual',
+        'pickupLocation': userLocation,
+        'estimatedFare': 5.0,
+        'status': ReservationStatus.pending.name,
+        'paymentStatus': PaymentStatus.pending.name,
+      });
 
       setState(() => _message = 'Reserva realizada con chofer más cercano.');
     } catch (e) {
@@ -106,7 +107,11 @@ class _RequestClosestDriverScreenState
             ElevatedButton(
               onPressed: _loading ? null : _findAndRequest,
               child: _loading
-                  ? const CircularProgressIndicator()
+                  ? const SizedBox(
+                      width: 24,
+                      height: 24,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    )
                   : const Text('Buscar y reservar'),
             ),
             if (_message != null) ...[

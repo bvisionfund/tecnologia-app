@@ -1,39 +1,43 @@
+// lib/screens/home_screen.dart
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geolocator/geolocator.dart';
 
 import '../app_router.dart';
 import '../providers/auth_provider.dart';
+import 'user/map_driver_list_screen.dart';
 
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({Key? key}) : super(key: key);
 
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    Future<bool> ensureLocationPermission() async {
-      bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
-      if (!serviceEnabled) {
-        await Geolocator.openLocationSettings();
-        return false;
-      }
-
-      LocationPermission permission = await Geolocator.checkPermission();
-      if (permission == LocationPermission.denied) {
-        permission = await Geolocator.requestPermission();
-        if (permission == LocationPermission.denied) {
-          return false;
-        }
-      }
-
-      if (permission == LocationPermission.deniedForever) {
-        await Geolocator.openAppSettings();
-        return false;
-      }
-
-      return true;
+  Future<bool> ensureLocationPermission() async {
+    bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      await Geolocator.openLocationSettings();
+      return false;
     }
 
+    LocationPermission permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) {
+        return false;
+      }
+    }
+
+    if (permission == LocationPermission.deniedForever) {
+      await Geolocator.openAppSettings();
+      return false;
+    }
+
+    return true;
+  }
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
     final user = ref.watch(authStateProvider).value;
+
     return Scaffold(
       appBar: AppBar(
         title: Text('Bienvenido, ${user?.email ?? ''}'),
@@ -47,66 +51,77 @@ class HomeScreen extends ConsumerWidget {
           ),
         ],
       ),
-      body: Column(
-        children: [
-          Center(
-            child: ElevatedButton(
-              onPressed: () => Navigator.pushNamed(context, Routes.drivers),
-              child: const Text('Ver choferes disponibles'),
-            ),
-          ),
-          //cuadro de separación
-          const SizedBox(height: 20),
-          ElevatedButton(
-            onPressed: () => Navigator.pushNamed(context, Routes.mapDrivers),
-            child: const Text('Ver choferes en mapa'),
-          ),
-          const SizedBox(height: 20),
-          ElevatedButton(
-            onPressed: () =>
-                Navigator.pushNamed(context, Routes.requestClosest),
-            child: const Text('Solicitar chofer más cercano'),
-          ),
-          const SizedBox(height: 20),
-          ElevatedButton(
-            onPressed: () => Navigator.pushNamed(context, Routes.myReservation),
-            child: const Text('Mis reservas'),
-          ),
-          const SizedBox(height: 20),
-          ElevatedButton(
-            onPressed: () async {
-              final granted = await ensureLocationPermission();
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(
-                    granted
-                        ? 'Permiso de ubicación concedido'
-                        : 'Permiso de ubicación no concedido',
-                  ),
-                ),
-              );
-            },
-            child: const Text('Activar ubicación'),
-          ),
-          const SizedBox(height: 20),
-          ElevatedButton(
-            onPressed: () =>
-                Navigator.pushNamed(context, Routes.completedReservations),
-            child: const Text('Reservas Completadas'),
-          ),
-        ],
-      ),
       drawer: Drawer(
         child: ListView(
           children: [
+            DrawerHeader(
+              child: Text(
+                'Menú',
+                style: Theme.of(context).textTheme.headlineMedium,
+              ),
+            ),
             ListTile(
-              leading: const Icon(Icons.person),
-              title: const Text('Mi Perfil'),
-              onTap: () => Navigator.pushNamed(context, Routes.profile),
+              leading: const Icon(Icons.map),
+              title: const Text('Ver choferes en mapa'),
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.pushNamed(context, Routes.mapDrivers);
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.list),
+              title: const Text('Ver choferes disponibles'),
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.pushNamed(context, Routes.drivers);
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.directions_car),
+              title: const Text('Solicitar chofer más cercano'),
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.pushNamed(context, Routes.requestClosest);
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.book),
+              title: const Text('Mis reservas'),
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.pushNamed(context, Routes.myReservation);
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.done_all),
+              title: const Text('Reservas Completadas'),
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.pushNamed(context, Routes.completedReservations);
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.gps_fixed),
+              title: const Text('Activar Ubicación'),
+              onTap: () async {
+                Navigator.pop(context);
+                final granted = await ensureLocationPermission();
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(
+                      granted
+                          ? 'Permiso de ubicación concedido'
+                          : 'Permiso de ubicación no concedido',
+                    ),
+                  ),
+                );
+              },
             ),
           ],
         ),
       ),
+      // Muestra directamente los choferes en mapa como pantalla principal
+      body: const MapDriverListScreen(),
     );
   }
 }
