@@ -1,3 +1,6 @@
+// lib/screens/login_screen.dart
+
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -31,6 +34,23 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           );
       final uid = cred.user!.uid;
 
+      // 1a) Verificar si es un chofer pendiente de aprobación
+      final driverDoc = await FirebaseFirestore.instance
+          .collection('drivers')
+          .doc(uid)
+          .get();
+      if (driverDoc.exists) {
+        final estado = driverDoc.data()?['estadoAprobacion'] as String?;
+        if (estado != 'aprobado') {
+          // Navegar a pantalla de solicitud pendiente
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (_) => const PendingApprovalScreen()),
+          );
+          return;
+        }
+      }
+
       // 2) Detectamos el rol en Firestore (admins, drivers, users)
       final role = await RoleService().detectRole(uid);
 
@@ -46,7 +66,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           Navigator.pushReplacementNamed(context, Routes.home);
           break;
         default:
-          // Nunca debería llegar aquí, pero por si acaso:
           ScaffoldMessenger.of(
             context,
           ).showSnackBar(const SnackBar(content: Text('Rol desconocido.')));
@@ -75,11 +94,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           child: SingleChildScrollView(
             child: Column(
               children: [
-                // Logo o título
                 const FlutterLogo(size: 100),
                 const SizedBox(height: 32),
-
-                // Correo
                 TextField(
                   controller: _emailCtrl,
                   keyboardType: TextInputType.emailAddress,
@@ -89,8 +105,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   ),
                 ),
                 const SizedBox(height: 16),
-
-                // Contraseña
                 TextField(
                   controller: _passCtrl,
                   obscureText: true,
@@ -100,21 +114,19 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   ),
                 ),
                 const SizedBox(height: 24),
-
-                // Botón Ingresar
                 SizedBox(
                   width: double.infinity,
                   height: 48,
                   child: ElevatedButton(
                     onPressed: _loading ? null : _login,
                     child: _loading
-                        ? const CircularProgressIndicator()
+                        ? const CircularProgressIndicator(
+                            valueColor: AlwaysStoppedAnimation(Colors.white),
+                          )
                         : const Text('Ingresar'),
                   ),
                 ),
                 const SizedBox(height: 12),
-
-                // Nuevo botón:
                 TextButton(
                   onPressed: _loading
                       ? null
@@ -123,6 +135,41 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 ),
               ],
             ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Pantalla que informa al chofer que su solicitud está pendiente
+class PendingApprovalScreen extends StatelessWidget {
+  const PendingApprovalScreen({Key? key}) : super(key: key);
+
+  Future<void> _logout(BuildContext context) async {
+    await FirebaseAuth.instance.signOut();
+    Navigator.pushReplacementNamed(context, Routes.login);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Solicitud Pendiente'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.logout),
+            onPressed: () => _logout(context),
+          ),
+        ],
+      ),
+      body: const Center(
+        child: Padding(
+          padding: EdgeInsets.all(24),
+          child: Text(
+            'Tu solicitud como chofer aún no ha sido aprobada por el administrador.\n\nPor favor, espera a que revisen y aprueben tu cuenta.',
+            textAlign: TextAlign.center,
+            style: TextStyle(fontSize: 16),
           ),
         ),
       ),
