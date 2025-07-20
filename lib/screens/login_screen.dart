@@ -94,7 +94,14 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           child: SingleChildScrollView(
             child: Column(
               children: [
-                const FlutterLogo(size: 100),
+                ClipOval(
+                  child: Image.asset(
+                    'assets/images/logo_safrider.png',
+                    width: 150, // ajusta a tu gusto
+                    height: 150,
+                    fit: BoxFit.cover,
+                  ),
+                ),
                 const SizedBox(height: 32),
                 TextField(
                   controller: _emailCtrl,

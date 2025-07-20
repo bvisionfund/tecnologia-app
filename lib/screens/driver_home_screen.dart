@@ -103,7 +103,7 @@ class _DriverHomeScreenState extends ConsumerState<DriverHomeScreen> {
           children: [
             DrawerHeader(
               child: Text(
-                'Menú del Chofer',
+                'Menú del Conductor',
                 style: Theme.of(context).textTheme.headlineMedium,
               ),
             ),
