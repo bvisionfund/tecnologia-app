@@ -15,12 +15,14 @@ class UserReservationsScreen extends ConsumerWidget {
       'pending': 'Pendiente',
       'accepted': 'Aceptada',
       'rejected': 'Rechazada',
+      'completed': 'Completada',
     };
 
     final statusColors = {
       'pending': Colors.yellow,
       'accepted': Colors.green,
       'rejected': Colors.red,
+      'completed': Colors.grey,
     };
     if (uid == null) {
       return const Scaffold(body: Center(child: Text('No estás autenticado')));
