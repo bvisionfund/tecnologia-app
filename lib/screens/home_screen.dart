@@ -61,6 +61,14 @@ class HomeScreen extends ConsumerWidget {
               ),
             ),
             ListTile(
+              leading: const Icon(Icons.person),
+              title: const Text('Perfil del Usuario'),
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.pushNamed(context, Routes.profile);
+              },
+            ),
+            ListTile(
               leading: const Icon(Icons.map),
               title: const Text('Ver choferes en mapa'),
               onTap: () {
