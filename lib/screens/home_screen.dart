@@ -6,6 +6,7 @@ import 'package:geolocator/geolocator.dart';
 
 import '../app_router.dart';
 import '../providers/auth_provider.dart';
+import '../providers/user_provider.dart';
 import 'user/map_driver_list_screen.dart';
 
 class HomeScreen extends ConsumerWidget {
@@ -36,11 +37,19 @@ class HomeScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final user = ref.watch(authStateProvider).value;
+    // Escuchamos el perfil completo del usuario
+    final appUserAsync = ref.watch(currentUserProvider);
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Bienvenido, ${user?.email ?? ''}'),
+        title: appUserAsync.when(
+          data: (appUser) {
+            final name = appUser?.nombre ?? '';
+            return Text('Bienvenido, ${name.isNotEmpty ? name : 'Usuario'}');
+          },
+          loading: () => const Text('Bienvenido'),
+          error: (_, __) => const Text('Bienvenido'),
+        ),
         actions: [
           IconButton(
             icon: const Icon(Icons.logout),
@@ -128,7 +137,7 @@ class HomeScreen extends ConsumerWidget {
           ],
         ),
       ),
-      // Muestra directamente los choferes en mapa como pantalla principal
+      // Mostrar directamente los choferes en mapa como pantalla principal
       body: const MapDriverListScreen(),
     );
   }

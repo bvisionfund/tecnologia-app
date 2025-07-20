@@ -87,7 +87,7 @@ class _DriverHomeScreenState extends ConsumerState<DriverHomeScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Panel de Chofer'),
+        title: const Text('Panel de Conductor'),
         actions: [
           IconButton(
             icon: const Icon(Icons.logout),
