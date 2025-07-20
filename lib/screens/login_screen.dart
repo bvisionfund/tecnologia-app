@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:tecnologia_app/utils/app_colors.dart';
 
 import '../app_router.dart';
 import '../providers/auth_provider.dart';
@@ -88,22 +89,31 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 24),
+      body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
+            padding: const EdgeInsets.symmetric(horizontal: 24),
             child: Column(
+              mainAxisSize: MainAxisSize.min,
               children: [
-                ClipOval(
-                  child: Image.asset(
-                    'assets/images/logo_safrider.png',
-                    width: 150, // ajusta a tu gusto
-                    height: 150,
-                    fit: BoxFit.cover,
+                Container(
+                  width: 140,
+                  height: 140,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: Colors.transparent,
+                    border: Border.all(color: AppColors.silverGrey, width: 4),
+                  ),
+                  child: ClipOval(
+                    child: Image.asset(
+                      'assets/images/logo_safrider.png',
+                      fit: BoxFit.cover,
+                    ),
                   ),
                 ),
                 const SizedBox(height: 32),
                 TextField(
+                  style: const TextStyle(color: AppColors.silverGrey),
                   controller: _emailCtrl,
                   keyboardType: TextInputType.emailAddress,
                   decoration: const InputDecoration(
@@ -113,6 +123,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 ),
                 const SizedBox(height: 16),
                 TextField(
+                  style: const TextStyle(color: AppColors.silverGrey),
                   controller: _passCtrl,
                   obscureText: true,
                   decoration: const InputDecoration(
